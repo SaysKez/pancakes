@@ -19,6 +19,7 @@ async function loadModels() {
 }
 
 let mouthPosition = { x: 320, y: 240 }; // Default position
+let mouthOpen = false;
 
 async function detectMouth() {
     const displaySize = { width: video.width, height: video.height };
@@ -33,6 +34,12 @@ async function detectMouth() {
             const mouthX = mouth.reduce((sum, point) => sum + point.x, 0) / mouth.length;
             const mouthY = mouth.reduce((sum, point) => sum + point.y, 0) / mouth.length;
             mouthPosition = { x: mouthX, y: mouthY };
+
+            // Calculate mouth openness
+            const upperLip = mouth[13];
+            const lowerLip = mouth[19];
+            const mouthHeight = Math.abs(lowerLip.y - upperLip.y);
+            mouthOpen = mouthHeight > 5; // Adjust threshold as needed
         }
     }, 100);
 }
@@ -88,7 +95,7 @@ function createObject() {
 function detectCollisions() {
     const mouth = getMouthPosition();
     objects = objects.filter(obj => {
-        if (isColliding(mouth, obj)) {
+        if (isColliding(mouth, obj) && mouthOpen) {
             score += obj.type === 'crepe' ? 1 : -1;
             return false; // Remove the object after collision
         }
@@ -97,7 +104,7 @@ function detectCollisions() {
 }
 
 function isColliding(mouth, obj) {
-    const mouthRadius = 20;
+    const mouthRadius = 30; // Increase radius for easier collision
     return Math.abs(mouth.x - obj.x) < mouthRadius && Math.abs(mouth.y - obj.y) < mouthRadius;
 }
 
