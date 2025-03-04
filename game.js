@@ -106,7 +106,7 @@ function detectCollisions() {
 }
 
 function isColliding(mouth, obj) {
-    const mouthRadius = 50; // Increase radius for easier collision
+    const mouthRadius = 200; // Increase radius for easier collision
     const colliding = Math.abs(mouth.x - obj.x) < mouthRadius && Math.abs(mouth.y - obj.y) < mouthRadius;
     if (colliding) {
         console.log(`Collision detected with ${obj.type}`);
