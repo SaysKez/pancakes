@@ -11,8 +11,8 @@ async function startWebcam() {
 }
 
 async function loadModels() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/pancakes/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/pancakes/models');
 }
 
 let mouthPosition = { x: 320, y: 240 }; // Default position
