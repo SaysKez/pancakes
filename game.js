@@ -52,6 +52,7 @@ function startGame() {
     objects = [];
     gameInterval = setInterval(gameLoop, 1000 / 60); // 60 FPS
     setTimeout(endGame, gameDuration * 1000); // End game after 1 minute
+    console.log("Game started");
 }
 
 function gameLoop() {
@@ -63,12 +64,15 @@ function gameLoop() {
 function updateObjects() {
     // Add new objects at random intervals
     if (Math.random() < 0.02) {
-        objects.push(createObject());
+        const newObj = createObject();
+        objects.push(newObj);
+        console.log("New object created:", newObj);
     }
 
     // Update position of each object
     objects.forEach(obj => {
         obj.y += obj.speed;
+        console.log("Object updated:", obj);
     });
 
     // Remove objects that have fallen off the screen
