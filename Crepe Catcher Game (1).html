@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crepe Catcher</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Carter One', sans-serif;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             background-color: #FFF5E1;
             overflow: hidden;
             text-align: center;
@@ -69,7 +66,7 @@
             font-size: 20px;
             margin: 20px;
             cursor: pointer;
-            font-family: 'Carter One', sans-serif;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
             box-shadow: 0 5px #FF7F50;
             transition: all 0.2s;
         }
@@ -103,7 +100,7 @@
         h1 {
             color: #FF6347;
             font-size: 40px;
-            /*text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         h2 {
             color: #FF9D6C;
@@ -113,22 +110,20 @@
             font-size: 18px;
             margin: 20px;
             color: #FF7F50;
-            font-family: 'Helvetica', sans-serif;
         }
     </style>
-    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.2/dist/face-api.js"></script>
 </head>
 <body>
-    <h1>Happy Pancake Day!</h1>
+    <h1>Crepe Catcher</h1>
     <div id="gameContainer">
         <video id="videoElement" autoplay playsinline></video>
         <canvas id="gameOverlay"></canvas>
         <div id="scoreDisplay">Score: 0</div>
         <div id="timerDisplay">Time: 60s</div>
         <div id="startScreen">
-            <h2>Catch the Pancakes!</h2>
+            <h2>Catch the Crepes!</h2>
             <p id="instructions">
-                Use your webcam to catch falling pancakes with your mouth.<br>
+                Use your webcam to catch falling crepes with your mouth.<br>
                 Avoid kitchen utensils - they'll cost you points!<br>
                 You have 60 seconds. Ready to play?
             </p>
@@ -187,10 +182,10 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60">
                 <ellipse cx="50" cy="30" rx="45" ry="25" fill="#F5DEB3" stroke="#D2B48C" stroke-width="2"/>
                 <ellipse cx="50" cy="30" rx="40" ry="20" fill="#F4A460" stroke="#D2691E" stroke-width="1" stroke-dasharray="5,3"/>
-                <circle cx="30" cy="20" r="4" fill="#E88E41"/>
-                <circle cx="60" cy="30" r="5" fill="#E88E41"/>
-                <circle cx="45" cy="35" r="3" fill="#E88E41"/>
-                <circle cx="70" cy="20" r="4" fill="#E88E41"/>
+                <circle cx="30" cy="20" r="4" fill="#8B4513"/>
+                <circle cx="60" cy="30" r="5" fill="#8B4513"/>
+                <circle cx="45" cy="35" r="3" fill="#8B4513"/>
+                <circle cx="70" cy="20" r="4" fill="#8B4513"/>
             </svg>
         `);
 
@@ -256,12 +251,13 @@
             }
 
             checkCollision() {
+                // Simple circle collision with mouth
                 if (!faceDetected) return false;
                 
                 const itemCenterX = this.x + this.width / 2;
                 const itemCenterY = this.y + this.height / 2;
                 
-                const mouthRadius = 25; // Match the visual size of our cartoon mouth
+                const mouthRadius = 20; // Approximate mouth size
                 const itemRadius = (this.width + this.height) / 4;
                 
                 const distance = Math.sqrt(
@@ -269,11 +265,7 @@
                     Math.pow(itemCenterY - mouthY, 2)
                 );
                 
-                const collision = distance < (mouthRadius + itemRadius);
-                if (collision) {
-                    console.log(`Collision detected with ${this.type} at (${itemCenterX}, ${itemCenterY})`);
-                }
-                return collision;
+                return distance < (mouthRadius + itemRadius);
             }
         }
 
@@ -304,81 +296,6 @@
                 console.error('Error accessing webcam:', error);
                 alert('Could not access webcam. Please allow camera access and reload the page.');
             }
-        }
-
-        // Initialize face detection
-        async function setupFaceDetection() {
-            try {
-                // Load models from a CDN
-                const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
-                
-                await Promise.all([
-                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
-                ]);
-                
-                console.log('Models loaded successfully');
-                
-                // Wait for video to be ready before starting face detection
-                if (video.readyState === 4) {
-                    // Video is already loaded
-                    detectFace();
-                } else {
-                    // Wait for video to load
-                    video.addEventListener('loadeddata', detectFace);
-                }
-            } catch (error) {
-                console.error('Error loading face detection models:', error);
-            }
-        }
-
-        async function detectFace() {
-            // Ensure video has valid dimensions
-            if (video.videoWidth === 0 || video.videoHeight === 0) {
-                console.error('Video dimensions are invalid');
-                return;
-            }
-            
-            const displaySize = { 
-                width: video.videoWidth, 
-                height: video.videoHeight 
-            };
-            
-            console.log('Display size for face detection:', displaySize);
-            
-            faceapi.matchDimensions(gameCanvas, displaySize);
-
-            setInterval(async () => {
-                try {
-                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
-                    
-                    if (detections && detections.length > 0) {
-                        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                        
-                        const mouth = resizedDetections[0].landmarks.getMouth();
-                        
-                        // Calculate the average mouth position
-                        let rawMouthX = mouth.reduce((sum, point) => sum + point.x, 0) / mouth.length;
-                        const rawMouthY = mouth.reduce((sum, point) => sum + point.y, 0) / mouth.length;
-                        
-                        // Flip the X coordinate to match the mirrored video display
-                        mouthX = displaySize.width - rawMouthX;
-                        mouthY = rawMouthY;
-
-                        // Calculate mouth openness
-                        const upperLip = mouth[13];
-                        const lowerLip = mouth[19];
-                        const mouthHeight = Math.abs(lowerLip.y - upperLip.y);
-                        faceDetected = mouthHeight > 2; // Adjust threshold as needed
-
-                        console.log(`Mouth detected: ${faceDetected}, Mouth height: ${mouthHeight}, Position: (${mouthX}, ${mouthY})`);
-                    } else {
-                        console.log('No face detected');
-                    }
-                } catch (error) {
-                    console.error('Error in face detection:', error);
-                }
-            }, 100);
         }
 
         // Game loop
@@ -447,73 +364,13 @@
             
             // Draw mouth position indicator
             if (faceDetected) {
-                // Draw semi-transparent open mouth with orange outline
-                
-                // Outer circle (semi-transparent)
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
                 ctx.beginPath();
-                ctx.ellipse(mouthX, mouthY, 25, 20, 0, 0, Math.PI * 2);
+                ctx.arc(mouthX, mouthY, 20, 0, Math.PI * 2);
                 ctx.fill();
-                
-                // Outline of outer circle
-                ctx.strokeStyle = '#FF6347'; // Tomato color
+                ctx.strokeStyle = '#FF6347';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                
-                // Draw mouth opening (dark semi-transparent)
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Darker semi-transparent black for open mouth
-                ctx.beginPath();
-                ctx.ellipse(mouthX, mouthY, 15, 12, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Draw teeth on top
-                ctx.fillStyle = 'white';
-                const teethWidth = 5;
-                const teethHeight = 7;
-                const teethGap = 1;
-                const teethCount = 5;
-                const totalTeethWidth = teethCount * teethWidth + (teethCount - 1) * teethGap;
-                const startX = mouthX - totalTeethWidth / 2;
-                
-                // Top teeth
-                for (let i = 0; i < teethCount; i++) {
-                    ctx.beginPath();
-                    ctx.rect(
-                        startX + i * (teethWidth + teethGap), 
-                        mouthY - 12, 
-                        teethWidth, 
-                        teethHeight
-                    );
-                    ctx.fill();
-                    
-                    // Add tooth outline
-                    ctx.strokeStyle = '#CCCCCC';
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
-                }
-                
-                // Bottom teeth
-                for (let i = 0; i < teethCount; i++) {
-                    ctx.beginPath();
-                    ctx.rect(
-                        startX + i * (teethWidth + teethGap), 
-                        mouthY + 5, 
-                        teethWidth, 
-                        teethHeight
-                    );
-                    ctx.fill();
-                    
-                    // Add tooth outline
-                    ctx.strokeStyle = '#CCCCCC';
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
-                }
-                
-                // Add a tongue
-                ctx.fillStyle = '#FF6666';
-                ctx.beginPath();
-                ctx.ellipse(mouthX, mouthY + 2, 8, 4, 0, 0, Math.PI, false);
-                ctx.fill();
             }
             
             // Continue the game loop
@@ -541,7 +398,6 @@
             // Set up mouse tracking for testing
             gameCanvas.addEventListener('mousemove', (e) => {
                 const rect = gameCanvas.getBoundingClientRect();
-                // Use direct mouse position without mirroring
                 mouthX = e.clientX - rect.left;
                 mouthY = e.clientY - rect.top;
                 faceDetected = true;
@@ -606,21 +462,8 @@
                 // Debug info
                 console.log("Game container dimensions:", container.clientWidth, "x", container.clientHeight);
                 console.log("Canvas dimensions:", gameCanvas.width, "x", gameCanvas.height);
-                
-                setupFaceDetection(); // Start face detection
             });
-
-            console.log('faceapi:', faceapi);
         };
-
-        // Check if face-api.js is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof faceapi === 'undefined') {
-                console.error('face-api.js is not loaded properly');
-            } else {
-                console.log('face-api.js is loaded successfully');
-            }
-        });
     </script>
 </body>
 </html>
