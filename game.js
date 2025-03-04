@@ -40,6 +40,7 @@ async function detectMouth() {
             const lowerLip = mouth[19];
             const mouthHeight = Math.abs(lowerLip.y - upperLip.y);
             mouthOpen = mouthHeight > 5; // Adjust threshold as needed
+            console.log(`Mouth open: ${mouthOpen}, Height: ${mouthHeight}`);
         }
     }, 100);
 }
@@ -97,6 +98,7 @@ function detectCollisions() {
     objects = objects.filter(obj => {
         if (isColliding(mouth, obj) && mouthOpen) {
             score += obj.type === 'crepe' ? 1 : -1;
+            console.log(`Scored: ${obj.type}, Score: ${score}`);
             return false; // Remove the object after collision
         }
         return true;
@@ -105,7 +107,11 @@ function detectCollisions() {
 
 function isColliding(mouth, obj) {
     const mouthRadius = 30; // Increase radius for easier collision
-    return Math.abs(mouth.x - obj.x) < mouthRadius && Math.abs(mouth.y - obj.y) < mouthRadius;
+    const colliding = Math.abs(mouth.x - obj.x) < mouthRadius && Math.abs(mouth.y - obj.y) < mouthRadius;
+    if (colliding) {
+        console.log(`Collision detected with ${obj.type}`);
+    }
+    return colliding;
 }
 
 function drawObjects() {
