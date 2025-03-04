@@ -39,7 +39,7 @@ async function detectMouth() {
             const upperLip = mouth[13];
             const lowerLip = mouth[19];
             const mouthHeight = Math.abs(lowerLip.y - upperLip.y);
-            mouthOpen = mouthHeight > 5; // Adjust threshold as needed
+            mouthOpen = mouthHeight > 2; // Adjust threshold as needed
             console.log(`Mouth open: ${mouthOpen}, Height: ${mouthHeight}`);
         }
     }, 100);
@@ -106,7 +106,7 @@ function detectCollisions() {
 }
 
 function isColliding(mouth, obj) {
-    const mouthRadius = 30; // Increase radius for easier collision
+    const mouthRadius = 50; // Increase radius for easier collision
     const colliding = Math.abs(mouth.x - obj.x) < mouthRadius && Math.abs(mouth.y - obj.y) < mouthRadius;
     if (colliding) {
         console.log(`Collision detected with ${obj.type}`);
