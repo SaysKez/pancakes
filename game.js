@@ -1,5 +1,7 @@
 // game.js
 
+const canvas = document.getElementById('gameCanvas');
+
 async function startWebcam() {
     const video = document.getElementById('webcam');
     try {
