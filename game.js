@@ -28,7 +28,6 @@ async function detectMouth() {
         const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
-        // Extract mouth position from landmarks
         if (detections.length > 0) {
             const mouth = detections[0].landmarks.getMouth();
             const mouthX = mouth.reduce((sum, point) => sum + point.x, 0) / mouth.length;
@@ -40,7 +39,7 @@ async function detectMouth() {
 
 let score = 0;
 let gameInterval;
-let gameDuration = 60; // 1 minute
+let gameDuration = 30; // 1 minute
 let objects = []; // Array to hold falling objects
 
 function startGame() {
@@ -88,11 +87,12 @@ function createObject() {
 
 function detectCollisions() {
     const mouth = getMouthPosition();
-    objects.forEach(obj => {
+    objects = objects.filter(obj => {
         if (isColliding(mouth, obj)) {
             score += obj.type === 'crepe' ? 1 : -1;
-            obj.y = canvas.height + 1;
+            return false; // Remove the object after collision
         }
+        return true;
     });
 }
 
